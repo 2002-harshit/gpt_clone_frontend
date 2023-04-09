@@ -1,10 +1,11 @@
 "use strict";
-
+// require("dotenv").config();
 const input_field = document.querySelector("#input-field");
 const main_content = document.querySelector(".main_content");
 const upper_main = document.querySelector(".upper_main");
 const lower_main = document.querySelector(".lower_main");
 let eventSource;
+const backend = `https://hungry-tank-top-toad.cyclic.app`;
 const assistant_context = {};
 let isFirst = 1;
 
@@ -55,13 +56,13 @@ async function getData(userInput) {
   try {
     //*handling streams
 
-    await fetch("http://localhost:8000/user_input", {
+    await fetch(`${backend || `http://localhost:8000`}/user_input`, {
       method: "POST",
       headers: { "Content-Type": "application/json;charset=UTF-8" },
       body: JSON.stringify({ role: "user", content: userInput }),
     });
 
-    eventSource = new EventSource("http://localhost:8000/sse");
+    eventSource = new EventSource(`${backend || `http://localhost:8000`}/sse`);
     assistant_context.role = "assistant";
     assistant_context.content = "";
     //* rendering an empty box
@@ -93,7 +94,7 @@ async function getData(userInput) {
       console.log("Stream completed");
       eventSource.close();
       document.querySelector(".stop_gen_holder").remove();
-      await fetch("http://localhost:8000/update_context", {
+      await fetch(`${backend || `http://localhost:8000`}/update_context`, {
         method: "POST",
         headers: { "Content-Type": "application/json;charset=UTF-8" },
         body: JSON.stringify(assistant_context),
@@ -157,7 +158,7 @@ document.querySelector(".new_chat").addEventListener("click", async () => {
     </div>`;
     // console.log("inside it");
     isFirst = 1;
-    await fetch("http://localhost:8000/chat_reset", {
+    await fetch(`${backend || `http://localhost:8000`}/chat_reset`, {
       method: "POST",
     });
     // const { msg } = await res.json();
